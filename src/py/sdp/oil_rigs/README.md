@@ -58,7 +58,7 @@ cd /path/to/spark-declarative-pipelines/src/py/sdp/oil_rigs
 
 ```bash
 cd /path/to/spark-declarative-pipelines/src/py/sdp
-python main.py oil-rigs
+uv run python main.py oil-rigs
 ```
 
 ### Option 3: Using SDP CLI
@@ -327,7 +327,7 @@ Queries the sensor events and displays data from both oil rigs.
 **Run the script:**
 ```bash
 cd /path/to/spark-declarative-pipelines/src/py/sdp/oil_rigs
-python query_oil_rigs_tables.py
+uv run python query_oil_rigs_tables.py
 ```
 
 ## Realistic Data Generation
@@ -431,29 +431,75 @@ libraries:
 - **Comparison Modes**: Overlay and side-by-side subplot layouts
 - **File Size**: ~4.9MB per HTML chart (includes full Plotly library)
 
-### Testing
+## Testing
 
-The plotting library includes comprehensive unit tests:
+The Oil Rigs pipeline includes comprehensive unit tests for the plotting library. All tests use the UV package manager for consistent execution.
+
+### Prerequisites for Testing
+
+Before running tests, ensure:
+1. **Dependencies are installed** (including dev dependencies):
+   ```bash
+   cd /path/to/spark-declarative-pipelines/src/py/sdp
+   uv sync --extra dev
+   ```
+
+2. **Pipeline has been executed** (optional for plotting library tests, but recommended for full validation):
+   ```bash
+   cd /path/to/spark-declarative-pipelines/src/py/sdp/oil_rigs
+   ./run_pipeline.sh
+   ```
+
+### Running Tests
 
 ```bash
-# Run all tests
+# From the oil_rigs directory
 cd /path/to/spark-declarative-pipelines/src/py/sdp/oil_rigs
+
+# Run all tests
 uv run pytest tests/test_plotting_lib.py -v
+
+# Run tests with detailed output
+uv run pytest tests/test_plotting_lib.py -v -s
+```
+
+### Running Specific Tests
+
+```bash
+cd /path/to/spark-declarative-pipelines/src/py/sdp/oil_rigs
 
 # Run specific test class
 uv run pytest tests/test_plotting_lib.py::TestSensorConfigs -v
+
+# Run specific test function
+uv run pytest tests/test_plotting_lib.py::TestSensorConfigs::test_sensor_config_creation -v
+
+# Run tests matching a pattern
+uv run pytest -k "config" -v
 ```
 
-**Test Coverage:**
-- ✅ **20 unit tests** covering configuration, filtering, and validation
-- ✅ **SensorPlotConfig** dataclass creation and defaults
-- ✅ **SENSOR_CONFIGS** dictionary validation
-- ✅ **DataFrame filtering** by rig name
-- ✅ **Rig name extraction** from data
-- ✅ **Filename and title generation** logic
-- ✅ **Configuration consistency** checks
+### Test Coverage
 
-All tests pass without requiring a full Spark cluster or database connection.
+The test suite includes **20 unit tests** covering:
+
+#### Configuration Tests
+- **SensorPlotConfig** dataclass creation and defaults
+- **SENSOR_CONFIGS** dictionary validation
+- Configuration consistency checks
+
+#### Data Processing Tests
+- **DataFrame filtering** by rig name
+- **Rig name extraction** from sensor data
+- Data validation and transformation logic
+
+#### Utility Tests
+- **Filename and title generation** logic
+- Path handling and file naming conventions
+- Plot configuration parameter validation
+
+### Test Execution Notes
+
+All tests pass without requiring a full Spark cluster or database connection, making them fast and suitable for development workflows.
 
 ## Dependencies
 
@@ -472,10 +518,6 @@ All tests pass without requiring a full Spark cluster or database connection.
 5. **Historical Analysis**: Add long-term trend analysis and seasonality detection
 6. **Comparative Analytics**: Cross-rig performance comparison and benchmarking
 
-## Related Pipelines
-
-- **BrickFood Pipeline**: E-commerce order processing example ([../brickfood/](../brickfood/))
-- **Music Analytics Pipeline**: Lakeflow Spark Declarative Pipelines example ([../../lsdp/music_analytics/](../../lsdp/music_analytics/))
 
 ## Troubleshooting
 

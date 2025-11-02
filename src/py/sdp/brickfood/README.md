@@ -39,21 +39,21 @@ brickfood/
 ### Option 1: Using the Shell Script
 
 ```bash
-cd /path/to/etl-pipelines/src/py/sdp/brickfood
+cd /path/to/spark-declarative-pipelines/src/py/sdp/brickfood
 ./run_pipeline.sh
 ```
 
 ### Option 2: Using Python Directly
 
 ```bash
-cd /path/to/etl-pipelines/src/py/sdp
-python main.py brickfood
+cd /path/to/spark-declarative-pipelines/src/py/sdp
+uv run python main.py brickfood
 ```
 
 ### Option 3: Using SDP CLI
 
 ```bash
-cd /path/to/etl-pipelines/src/py/sdp/brickfood
+cd /path/to/spark-declarative-pipelines/src/py/sdp/brickfood
 spark-pipelines run --conf spark.sql.catalogImplementation=hive --conf spark.sql.warehouse.dir=spark-warehouse
 ```
 
@@ -112,8 +112,8 @@ Queries the orders materialized view and displays approved orders with selected 
 
 **Run the script:**
 ```bash
-cd /path/to/etl-pipelines/src/py/sdp/brickfood
-python query_tables.py
+cd /path/to/spark-declarative-pipelines/src/py/sdp/brickfood
+uv run python query_tables.py
 ```
 
 **Sample Output:**
@@ -144,8 +144,8 @@ Calculates total order prices and applies 15% sales tax to approved orders. Prov
 
 **Run the script:**
 ```bash
-cd /path/to/etl-pipelines/src/py/sdp/brickfood
-python calculate_sales_tax.py
+cd /path/to/spark-declarative-pipelines/src/py/sdp/brickfood
+uv run python calculate_sales_tax.py
 ```
 
 **Sample Output:**
@@ -201,6 +201,113 @@ only showing top 10 rows
 +---------------+----------------------+-------------------+--------------------+
 ```
 
+## Testing
+
+The BrickFood pipeline includes comprehensive tests for querying and validating materialized views. All tests use the UV package manager for consistent execution.
+
+### Prerequisites for Testing
+
+Before running tests, ensure:
+1. **Dependencies are installed** (including dev dependencies):
+   ```bash
+   cd /path/to/spark-declarative-pipelines/src/py/sdp
+   uv sync --extra dev
+   ```
+
+2. **Pipeline has been executed** to create materialized views:
+   ```bash
+   cd /path/to/spark-declarative-pipelines/src/py/sdp/brickfood
+   ./run_pipeline.sh
+   ```
+
+### Running Tests
+
+```bash
+# From the brickfood directory
+cd /path/to/spark-declarative-pipelines/src/py/sdp/brickfood
+
+# Run all tests
+uv run pytest tests/ -v
+
+# Run tests with detailed output (shows query results and data)
+uv run pytest tests/ -v -s
+```
+
+### Running Specific Tests
+
+```bash
+cd /path/to/spark-declarative-pipelines/src/py/sdp/brickfood
+
+# Run only materialized view tests
+uv run pytest tests/test_materialized_views.py -v
+
+# Run a specific test function
+uv run pytest tests/test_materialized_views.py::test_query_orders_mv -v
+
+# Run tests matching a pattern
+uv run pytest -k "orders" -v
+```
+
+### Test Coverage
+
+The test suite includes **9 test functions** covering:
+
+#### Core Materialized View Tests
+- `test_query_orders_mv` - Queries base orders_mv and validates schema/data
+- `test_query_approved_orders_mv` - Validates approved orders filtering
+- `test_query_fulfilled_orders_mv` - Validates fulfilled orders filtering
+- `test_query_pending_orders_mv` - Validates pending orders filtering
+
+#### Data Validation Tests
+- `test_verify_status_distribution` - Ensures status views sum to total orders
+- `test_verify_column_consistency` - Validates consistent schema across all views
+
+#### Analytics Tests
+- `test_query_orders_by_price_range` - Analyzes price distribution (< $100, $100-$500, >= $500)
+- `test_query_orders_by_item` - Groups orders by product with statistics
+- `test_query_orders_by_date_range` - Validates date ranges
+
+### Expected Test Output
+
+```
+============================= test session starts ==============================
+collected 9 items
+
+tests/test_materialized_views.py::test_query_orders_mv PASSED           [ 11%]
+tests/test_materialized_views.py::test_query_approved_orders_mv PASSED  [ 22%]
+tests/test_materialized_views.py::test_query_fulfilled_orders_mv PASSED [ 33%]
+tests/test_materialized_views.py::test_query_pending_orders_mv PASSED   [ 44%]
+tests/test_materialized_views.py::test_verify_status_distribution PASSED [ 55%]
+tests/test_materialized_views.py::test_verify_column_consistency PASSED [ 66%]
+tests/test_materialized_views.py::test_query_orders_by_price_range PASSED [ 77%]
+tests/test_materialized_views.py::test_query_orders_by_item PASSED      [ 88%]
+tests/test_materialized_views.py::test_query_orders_by_date_range PASSED [100%]
+
+========================= 9 passed in 7.07s ============================
+```
+
+### Sample Test Output with Details
+
+When running with `-s` flag, tests show query results:
+
+```
+=== orders_mv Sample Data ===
++------------------------------------+----------+------+-------------+---------+------------+
+|order_id                            |order_item|price |items_ordered|status   |date_ordered|
++------------------------------------+----------+------+-------------+---------+------------+
+|067f85a9-b726-43f2-a318-fdaf974d0c5f|Board Game|923.22|7            |pending  |2025-09-25  |
+|8552e9db-0c10-4fe6-92d5-a0c950a0975a|Scooter   |905.52|6            |approved |2025-09-19  |
++------------------------------------+----------+------+-------------+---------+------------+
+Total rows: 100
+
+=== Status Distribution ===
+Total orders: 100
+Approved: 35
+Fulfilled: 29
+Pending: 36
+Sum: 100
+```
+
 ## Key Insights from Sales Data
 
 Based on the sample output above:
@@ -243,7 +350,7 @@ libraries:
 
 ## Dependencies
 
-- PySpark 4.1.0.dev1
+- PySpark 4.1.0.dev3
 - Faker (for data generation)
 - Plotly (for visualization capabilities)
 
