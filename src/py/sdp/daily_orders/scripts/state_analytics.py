@@ -26,17 +26,13 @@ from pyspark.sql.functions import (
     count, sum as _sum, avg, round as _round, col, desc
 )
 
-# Initialize Spark session with Hive support
-spark = (SparkSession.builder.appName("StateAnalytics")
-       .enableHiveSupport()
-        .getOrCreate())
 
-
-def show_state_distribution(top_n: int = 10):
+def show_state_distribution(spark: SparkSession, top_n: int = 10):
     """
     Display order distribution and revenue by state.
 
     Args:
+        spark: SparkSession instance
         top_n: Number of top states to display (default: 10)
     """
     # Read orders from materialized view
@@ -66,11 +62,12 @@ def show_state_distribution(top_n: int = 10):
     print(f"Average Orders per State: {total_orders / total_states:.1f}")
 
 
-def show_status_by_state(top_n: int = 10):
+def show_status_by_state(spark: SparkSession, top_n: int = 10):
     """
     Display order status distribution by state.
 
     Args:
+        spark: SparkSession instance
         top_n: Number of top states to display (default: 10)
     """
     orders_df = spark.read.table("orders_mv")
@@ -88,11 +85,12 @@ def show_status_by_state(top_n: int = 10):
     status_by_state.show(top_n, truncate=False)
 
 
-def show_state_details(state_name: str):
+def show_state_details(spark: SparkSession, state_name: str):
     """
     Display detailed analytics for a specific state.
 
     Args:
+        spark: SparkSession instance
         state_name: Name of the US state to analyze
     """
     orders_df = spark.read.table("orders_mv")
@@ -147,11 +145,12 @@ def show_state_details(state_name: str):
     top_products.show(truncate=False)
 
 
-def export_to_csv(output_file: str):
+def export_to_csv(spark: SparkSession, output_file: str):
     """
     Export state analytics to CSV file.
 
     Args:
+        spark: SparkSession instance
         output_file: Path to output CSV file
     """
     orders_df = spark.read.table("orders_mv")
@@ -234,21 +233,27 @@ Examples:
 
     args = parser.parse_args()
 
-    # Handle state-specific query
-    if args.state:
-        show_state_details(args.state)
-    # Handle export
-    elif args.export:
-        export_to_csv(args.export)
-    # Default: show distribution
-    else:
-        show_state_distribution(args.top)
+    # Initialize Spark session with Hive support
+    spark = (SparkSession.builder.appName("StateAnalytics")
+           .enableHiveSupport()
+            .getOrCreate())
 
-        if args.show_status:
-            show_status_by_state(args.top)
+    try:
+        # Handle state-specific query
+        if args.state:
+            show_state_details(spark, args.state)
+        # Handle export
+        elif args.export:
+            export_to_csv(spark, args.export)
+        # Default: show distribution
+        else:
+            show_state_distribution(spark, args.top)
 
-    # Stop Spark session
-    spark.stop()
+            if args.show_status:
+                show_status_by_state(spark, args.top)
+    finally:
+        # Stop Spark session
+        spark.stop()
 
 
 if __name__ == "__main__":
