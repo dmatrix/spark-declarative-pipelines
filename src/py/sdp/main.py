@@ -3,12 +3,12 @@
 Spark Declarative Pipelines (SDP) Examples
 
 This module provides a command-line interface to run the SDP example pipelines:
-- BrickFood: E-commerce order processing and analytics
+- Daily Orders: E-commerce order processing and analytics
 - Oil Rigs: Industrial IoT sensor monitoring and analysis
 
 Usage:
     python main.py --help
-    python main.py brickfood
+    python main.py daily-orders
     python main.py oil-rigs
 """
 
@@ -19,19 +19,19 @@ import os
 from pathlib import Path
 
 
-def run_brickfood_pipeline():
-    """Run the BrickFood e-commerce pipeline."""
-    print("🏪 Running BrickFood E-commerce Pipeline...")
+def run_daily_orders_pipeline():
+    """Run the Daily Orders e-commerce pipeline."""
+    print("🏪 Running Daily Orders E-commerce Pipeline...")
     print("=" * 50)
-    
-    brickfood_dir = Path("brickfood")
-    if not brickfood_dir.exists():
-        print(f"Error: {brickfood_dir} directory not found!")
+
+    daily_orders_dir = Path("daily_orders")
+    if not daily_orders_dir.exists():
+        print(f"Error: {daily_orders_dir} directory not found!")
         return 1
     
     try:
-        # Change to brickfood directory and run pipeline
-        os.chdir(brickfood_dir)
+        # Change to daily_orders directory and run pipeline
+        os.chdir(daily_orders_dir)
         
         print("1. Executing SDP pipeline...")
         try:
@@ -43,12 +43,12 @@ def run_brickfood_pipeline():
             return 1
         
         print("\n2. Querying order data...")
-        subprocess.run(["python", "query_tables.py"], check=True)
-        
+        subprocess.run(["python", "scripts/query_tables.py"], check=True)
+
         print("\n3. Calculating sales tax and analytics...")
-        subprocess.run(["python", "calculate_sales_tax.py"], check=True)
+        subprocess.run(["python", "scripts/calculate_sales_tax.py"], check=True)
         
-        print("\n✅ BrickFood pipeline completed successfully!")
+        print("\n✅ Daily Orders pipeline completed successfully!")
         return 0
         
     except Exception as e:
@@ -104,7 +104,7 @@ def main():
         formatter_class=argparse.RawDescriptionHelpFormatter,
         epilog="""
 Examples:
-  python main.py brickfood    # Run BrickFood e-commerce pipeline
+  python main.py daily-orders # Run Daily Orders e-commerce pipeline
   python main.py oil-rigs     # Run Oil Rigs sensor monitoring pipeline
   
 Requirements:
@@ -117,7 +117,7 @@ For more information, see SDP_README.md
     
     parser.add_argument(
         "pipeline",
-        choices=["brickfood", "oil-rigs"],
+        choices=["daily-orders", "oil-rigs"],
         help="Pipeline to run"
     )
     
@@ -136,8 +136,8 @@ For more information, see SDP_README.md
     print("🚀 Spark Declarative Pipelines (SDP) Examples")
     print("=" * 50)
     
-    if args.pipeline == "brickfood":
-        return run_brickfood_pipeline()
+    if args.pipeline == "daily-orders":
+        return run_daily_orders_pipeline()
     elif args.pipeline == "oil-rigs":
         return run_oil_rigs_pipeline()
     else:

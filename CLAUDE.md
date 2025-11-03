@@ -7,7 +7,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 This repository contains modern ETL pipeline implementations demonstrating different data processing paradigms and frameworks. The project showcases both **Spark Declarative Pipelines (SDP)** for analytics workloads and **Lakeflow Spark Declarative Pipelines (LSDP)** for streaming data processing:
 
 ### SDP Examples (src/py/sdp/)
-1. **BrickFood** (`src/py/sdp/brickfood/`) - E-commerce order processing and analytics system
+1. **Daily Orders** (`src/py/sdp/daily_orders/`) - E-commerce order processing and analytics system
 2. **Oil Rigs** (`src/py/sdp/oil_rigs/`) - Industrial IoT sensor monitoring and analysis system
 
 ### LSDP Examples (src/py/lsdp/)
@@ -33,10 +33,10 @@ source .venv/bin/activate
 
 #### SDP Pipelines
 ```bash
-# Run BrickFood pipeline
-cd src/py/sdp/brickfood && ./run_pipeline.sh
+# Run Daily Orders pipeline
+cd src/py/sdp/daily_orders && ./run_pipeline.sh
 # OR
-cd src/py/sdp && python main.py brickfood
+cd src/py/sdp && python main.py daily-orders
 
 # Run Oil Rigs pipeline
 cd src/py/sdp/oil_rigs && ./run_pipeline.sh
@@ -66,17 +66,17 @@ cat README.md
 # Install dev dependencies (includes pytest)
 cd src/py/sdp && uv sync --extra dev
 
-# Run BrickFood tests (9 comprehensive tests for materialized views)
-cd src/py/sdp/brickfood && uv run pytest tests/ -v
+# Run Daily Orders tests (9 comprehensive tests for materialized views)
+cd src/py/sdp/daily_orders && uv run pytest tests/ -v
 
 # Run tests with detailed output (shows query results)
-cd src/py/sdp/brickfood && uv run pytest -v -s
+cd src/py/sdp/daily_orders && uv run pytest -v -s
 
 # Run specific test function
-cd src/py/sdp/brickfood && uv run pytest tests/test_materialized_views.py::test_query_orders_mv -v
+cd src/py/sdp/daily_orders && uv run pytest tests/test_materialized_views.py::test_query_orders_mv -v
 
 # Run tests matching a pattern
-cd src/py/sdp/brickfood && uv run pytest -k "orders" -v
+cd src/py/sdp/daily_orders && uv run pytest -k "orders" -v
 ```
 
 #### Code Quality Tools
@@ -93,13 +93,13 @@ cd src/py/sdp && uv pip install -e .
 #### Query and Analysis Scripts
 ```bash
 # Use script commands defined in pyproject.toml
-sdp-brickfood    # Run BrickFood queries
+sdp-daily-orders # Run Daily Orders queries
 sdp-oil-rigs     # Run Oil Rigs queries
 
-# Or run directly from brickfood directory
-cd src/py/sdp/brickfood
-uv run python query_tables.py           # Query approved orders
-uv run python calculate_sales_tax.py     # Calculate sales tax and analytics
+# Or run directly from daily_orders directory
+cd src/py/sdp/daily_orders
+uv run python scripts/query_tables.py           # Query approved orders
+uv run python scripts/calculate_sales_tax.py     # Calculate sales tax and analytics
 ```
 
 ## Architecture Overview
@@ -206,13 +206,13 @@ lsdp_pipeline_name/
 - Shared utilities are in `utils/` and loaded dynamically across pipelines
 
 ### SDP Testing
-- Tests are organized under each pipeline's `tests/` directory (e.g., `brickfood/tests/`)
+- Tests are organized under each pipeline's `tests/` directory (e.g., `daily_orders/tests/`)
 - Test files use pytest framework with simple function-based tests (no classes)
-- BrickFood test suite includes 9 comprehensive tests:
+- Daily Orders test suite includes 9 comprehensive tests:
   - **Core Tests**: Query all materialized views (orders_mv, approved_orders_mv, fulfilled_orders_mv, pending_orders_mv)
   - **Validation Tests**: Verify status distribution and column consistency
   - **Analytics Tests**: Price range analysis, item-level statistics, date range validation
-- Run tests from pipeline directory: `cd brickfood && uv run pytest tests/ -v`
+- Run tests from pipeline directory: `cd daily_orders && uv run pytest tests/ -v`
 - All tests validate data integrity, schema consistency, and analytical queries
 
 ### LSDP on Databricks Transformations
@@ -230,11 +230,12 @@ etl-pipelines/
     ├── sdp/                  # Spark Declarative Pipelines
     │   ├── pyproject.toml    # UV project configuration
     │   ├── README.md         # Comprehensive SDP documentation
-    │   ├── brickfood/        # E-commerce analytics pipeline
+    │   ├── daily_orders/     # E-commerce analytics pipeline
+    │   │   ├── scripts/      # Query and analysis scripts
+    │   │   │   ├── query_tables.py        # Query approved orders
+    │   │   │   └── calculate_sales_tax.py # Sales tax analytics
     │   │   ├── tests/        # Test suite with 9 tests for materialized views
-    │   │   ├── transformations/  # Orders materialized views (Python + SQL)
-    │   │   ├── query_tables.py   # Query approved orders
-    │   │   └── calculate_sales_tax.py  # Sales tax analytics
+    │   │   └── transformations/  # Orders materialized views (Python + SQL)
     │   ├── oil_rigs/         # IoT sensor monitoring pipeline
     │   └── utils/            # Shared utilities (order_gen_util, oil_gen_util)
     ├── lsdp/                 # Lakeflow Spark Declarative Pipelines (on Databricks)
@@ -242,9 +243,9 @@ etl-pipelines/
     └── generators/           # Cross-framework data generators
 ```
 
-## BrickFood Pipeline Details
+## Daily Orders Pipeline Details
 
-The BrickFood pipeline demonstrates e-commerce order processing with comprehensive testing:
+The Daily Orders pipeline demonstrates e-commerce order processing with comprehensive testing:
 
 ### Materialized Views
 1. **orders_mv** - Base orders table (100 orders with random data)
@@ -253,8 +254,8 @@ The BrickFood pipeline demonstrates e-commerce order processing with comprehensi
 4. **pending_orders_mv** - Filtered view for pending orders
 
 ### Analytics Scripts
-- **query_tables.py** - Queries and displays approved orders
-- **calculate_sales_tax.py** - Calculates 15% sales tax, provides:
+- **scripts/query_tables.py** - Queries and displays approved orders
+- **scripts/calculate_sales_tax.py** - Calculates 15% sales tax, provides:
   - Individual order totals with tax
   - Summary statistics (total sales, tax collected, grand total)
   - Breakdown by product item

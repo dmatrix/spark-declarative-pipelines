@@ -1,13 +1,13 @@
-# BrickFood - E-commerce Order Processing Pipeline
+# Daily Orders - E-commerce Order Processing Pipeline
 
 ## Overview
 
-BrickFood is a complete e-commerce order processing and analytics system built using Spark Declarative Pipelines (SDP). It demonstrates synthetic order data generation, materialized view transformations, and comprehensive sales analytics including tax calculations.
+Daily Orders is a complete e-commerce order processing and analytics system built using Spark Declarative Pipelines (SDP). It demonstrates synthetic order data generation, materialized view transformations, and comprehensive sales analytics including tax calculations.
 
 ## Project Structure
 
 ```
-brickfood/
+daily_orders/
 ├── README.md                       # This file
 ├── pipeline.yml                    # SDP pipeline configuration
 ├── run_pipeline.sh                 # Pipeline execution script
@@ -17,11 +17,11 @@ brickfood/
 │   ├── approved_orders_mv.sql      # Approved orders filter (SQL)
 │   ├── fulfilled_orders_mv.sql     # Fulfilled orders filter (SQL)
 │   └── pending_orders_mv.sql       # Pending orders filter (SQL)
-├── query_tables.py                 # Query and display order data
-├── calculate_sales_tax.py          # Sales tax calculations and analytics
-├── artifacts/                      # Build artifacts
-│   └── utils/                      # Pipeline-specific utilities
-│       └── order_gen_util.py       # Order data generation utilities
+├── scripts/                        # Query and analysis scripts
+│   ├── query_tables.py             # Query and display order data
+│   └── calculate_sales_tax.py      # Sales tax calculations and analytics
+├── tests/                          # Test suite for materialized views
+│   └── test_materialized_views.py  # 9 comprehensive tests
 ├── spark-warehouse/                # Generated Spark warehouse data (auto-generated)
 └── metastore_db/                   # Derby database files (auto-generated)
 ```
@@ -39,7 +39,7 @@ brickfood/
 ### Option 1: Using the Shell Script
 
 ```bash
-cd /path/to/spark-declarative-pipelines/src/py/sdp/brickfood
+cd /path/to/spark-declarative-pipelines/src/py/sdp/daily_orders
 ./run_pipeline.sh
 ```
 
@@ -47,13 +47,13 @@ cd /path/to/spark-declarative-pipelines/src/py/sdp/brickfood
 
 ```bash
 cd /path/to/spark-declarative-pipelines/src/py/sdp
-uv run python main.py brickfood
+uv run python main.py daily-orders
 ```
 
 ### Option 3: Using SDP CLI
 
 ```bash
-cd /path/to/spark-declarative-pipelines/src/py/sdp/brickfood
+cd /path/to/spark-declarative-pipelines/src/py/sdp/daily_orders
 spark-pipelines run --conf spark.sql.catalogImplementation=hive --conf spark.sql.warehouse.dir=spark-warehouse
 ```
 
@@ -106,14 +106,14 @@ WHERE status = 'pending';
 
 ## Query Scripts
 
-### 1. Query Tables (query_tables.py)
+### 1. Query Tables (scripts/query_tables.py)
 
 Queries the orders materialized view and displays approved orders with selected fields.
 
 **Run the script:**
 ```bash
-cd /path/to/spark-declarative-pipelines/src/py/sdp/brickfood
-uv run python query_tables.py
+cd /path/to/spark-declarative-pipelines/src/py/sdp/daily_orders
+uv run python scripts/query_tables.py
 ```
 
 **Sample Output:**
@@ -135,7 +135,7 @@ uv run python query_tables.py
 only showing top 10 rows
 ```
 
-### 2. Calculate Sales Tax (calculate_sales_tax.py)
+### 2. Calculate Sales Tax (scripts/calculate_sales_tax.py)
 
 Calculates total order prices and applies 15% sales tax to approved orders. Provides detailed analytics including:
 - Individual order totals with tax
@@ -144,8 +144,8 @@ Calculates total order prices and applies 15% sales tax to approved orders. Prov
 
 **Run the script:**
 ```bash
-cd /path/to/spark-declarative-pipelines/src/py/sdp/brickfood
-uv run python calculate_sales_tax.py
+cd /path/to/spark-declarative-pipelines/src/py/sdp/daily_orders
+uv run python scripts/calculate_sales_tax.py
 ```
 
 **Sample Output:**
@@ -203,7 +203,7 @@ only showing top 10 rows
 
 ## Testing
 
-The BrickFood pipeline includes comprehensive tests for querying and validating materialized views. All tests use the UV package manager for consistent execution.
+The Daily Orders pipeline includes comprehensive tests for querying and validating materialized views. All tests use the UV package manager for consistent execution.
 
 ### Prerequisites for Testing
 
@@ -216,15 +216,15 @@ Before running tests, ensure:
 
 2. **Pipeline has been executed** to create materialized views:
    ```bash
-   cd /path/to/spark-declarative-pipelines/src/py/sdp/brickfood
+   cd /path/to/spark-declarative-pipelines/src/py/sdp/daily_orders
    ./run_pipeline.sh
    ```
 
 ### Running Tests
 
 ```bash
-# From the brickfood directory
-cd /path/to/spark-declarative-pipelines/src/py/sdp/brickfood
+# From the daily_orders directory
+cd /path/to/spark-declarative-pipelines/src/py/sdp/daily_orders
 
 # Run all tests
 uv run pytest tests/ -v
@@ -236,7 +236,7 @@ uv run pytest tests/ -v -s
 ### Running Specific Tests
 
 ```bash
-cd /path/to/spark-declarative-pipelines/src/py/sdp/brickfood
+cd /path/to/spark-declarative-pipelines/src/py/sdp/daily_orders
 
 # Run only materialized view tests
 uv run pytest tests/test_materialized_views.py -v
@@ -341,7 +341,7 @@ The pipeline demonstrates the SDP framework's hybrid approach:
 
 The `pipeline.yml` file uses glob patterns to auto-discover transformations:
 ```yaml
-name: brickfood
+name: daily_orders
 storage: storage-root
 libraries:
   - glob:

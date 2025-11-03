@@ -1,4 +1,4 @@
-"""Tests for querying BrickFood materialized views."""
+"""Tests for querying Daily Orders materialized views."""
 import pytest
 from pyspark.sql import SparkSession
 
@@ -7,7 +7,7 @@ from pyspark.sql import SparkSession
 def spark():
     """Create a SparkSession for testing materialized views."""
     spark = (SparkSession.builder
-             .appName("BrickFood-MV-Tests")
+             .appName("DailyOrders-MV-Tests")
             #  .config("spark.sql.catalogImplementation", "hive")
             #  .config("spark.sql.warehouse.dir", "file:///./spark-warehouse/")
              .enableHiveSupport()

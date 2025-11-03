@@ -8,7 +8,7 @@ This project is structured as a **uv-managed Python package** with PySpark 4.1.0
 
 The SDP directory demonstrates two complete data processing pipelines:
 
-1. **BrickFood** - An e-commerce order processing and analytics system
+1. **Daily Orders** - An e-commerce order processing and analytics system
 2. **Oil Rigs** - An industrial IoT sensor monitoring and analysis system
 
 Each project showcases different aspects of the SDP framework, from synthetic data generation and materialized view creation to business analytics and sensor data visualization.
@@ -56,8 +56,8 @@ Each project showcases different aspects of the SDP framework, from synthetic da
 # Navigate to SDP directory
 cd src/py/sdp
 
-# Run BrickFood e-commerce pipeline
-uv run python main.py brickfood
+# Run Daily Orders e-commerce pipeline
+uv run python main.py daily-orders
 
 # Run Oil Rigs sensor monitoring pipeline
 uv run python main.py oil-rigs
@@ -78,7 +78,7 @@ uv run sdp-test-oil-sensors
 
 ## Pipeline Examples
 
-### BrickFood E-commerce Pipeline
+### Daily Orders E-commerce Pipeline
 
 Demonstrates a complete e-commerce order processing system with order lifecycle management, financial calculations, and business analytics.
 
@@ -88,7 +88,7 @@ Demonstrates a complete e-commerce order processing system with order lifecycle 
 - Sales tax calculations and analytics
 - Product category analysis
 
-**Learn More:** See [brickfood/README.md](brickfood/README.md) for:
+**Learn More:** See [daily_orders/README.md](daily_orders/README.md) for:
 - Detailed project structure
 - Data transformations and materialized views
 - Pipeline execution instructions
@@ -125,7 +125,7 @@ Generates realistic e-commerce order data for testing and development.
 - 20+ product categories (toys, electronics, sports equipment)
 - Realistic price ranges, quantities, and order statuses
 
-**Usage Examples:** See [brickfood/README.md](brickfood/README.md#data-generation)
+**Usage Examples:** See [daily_orders/README.md](daily_orders/README.md#data-generation)
 
 ### Oil Rig Sensor Utilities (`utils/oil_gen_util.py`)
 
@@ -197,7 +197,7 @@ Generates realistic industrial IoT sensor data for oil rig monitoring systems wi
 
 ## Documentation Links
 
-- **[BrickFood README](brickfood/README.md)**: Complete e-commerce pipeline documentation
+- **[Daily Orders README](daily_orders/README.md)**: Complete e-commerce pipeline documentation
 - **[Oil Rigs README](oil_rigs/README.md)**: Complete IoT monitoring pipeline documentation
 - **[Project Root README](../../../README.md)**: Overall project overview
 - **[CLAUDE.md](../../../CLAUDE.md)**: Claude Code configuration and development guidance
@@ -225,7 +225,7 @@ uv run python -c "import pyspark; print(pyspark.__version__)"
 
 ```bash
 # Make sure shell scripts are executable
-chmod +x brickfood/run_pipeline.sh
+chmod +x daily_orders/run_pipeline.sh
 chmod +x oil_rigs/run_pipeline.sh
 ```
 
