@@ -66,16 +66,6 @@ uv run python main.py oil-rigs
 uv run python main.py --help
 ```
 
-### Testing Utilities
-
-```bash
-# Test order generation utility
-uv run sdp-test-orders
-
-# Test oil sensor generation utility
-uv run sdp-test-oil-sensors
-```
-
 ## Pipeline Examples
 
 ### Daily Orders E-commerce Pipeline

@@ -39,10 +39,6 @@ dev = [
     "mypy>=1.0",
 ]
 
-[project.scripts]
-sdp-daily-orders = "daily_orders.query_tables:main"
-sdp-oil-rigs = "oil_rigs.query_oil_rigs_tables:main"
-
 [build-system]
 requires = ["setuptools>=45", "wheel"]
 build-backend = "setuptools.build_meta"
