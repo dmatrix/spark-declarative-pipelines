@@ -30,7 +30,7 @@ def test_query_orders_mv(spark):
     assert row_count > 0, f"orders_mv should have data, found {row_count} rows"
 
     # Check expected columns
-    expected_columns = ["order_id", "order_item", "price", "items_ordered", "status", "date_ordered"]
+    expected_columns = ["order_id", "order_item", "price", "items_ordered", "status", "state", "date_ordered"]
     assert df.columns == expected_columns, f"orders_mv should have columns: {expected_columns}"
 
     # Show sample data
@@ -114,6 +114,31 @@ def test_query_pending_orders_mv(spark):
         print("No pending orders found (this is okay if data is random)")
 
 
+def test_query_cancelled_orders_mv(spark):
+    """Test querying the cancelled_orders_mv materialized view."""
+    # Query the cancelled orders materialized view
+    df = spark.read.table("cancelled_orders_mv")
+
+    # Check that the view exists
+    assert df is not None, "cancelled_orders_mv should exist"
+
+    row_count = df.count()
+    print(f"\n=== cancelled_orders_mv ===")
+    print(f"Total cancelled orders: {row_count}")
+
+    # If there are rows, verify all have status = 'cancelled'
+    if row_count > 0:
+        statuses = df.select("status").distinct().collect()
+        assert len(statuses) == 1, "cancelled_orders_mv should only have 'cancelled' status"
+        assert statuses[0].status == "cancelled", "All orders should have status = 'cancelled'"
+
+        # Show sample data
+        print("\nSample cancelled orders:")
+        df.show(5, truncate=False)
+    else:
+        print("No cancelled orders found (this is okay if data is random)")
+
+
 def test_verify_status_distribution(spark):
     """Test that orders are properly distributed across all status views."""
     # Get counts from each view
@@ -121,15 +146,17 @@ def test_verify_status_distribution(spark):
     approved_count = spark.read.table("approved_orders_mv").count()
     fulfilled_count = spark.read.table("fulfilled_orders_mv").count()
     pending_count = spark.read.table("pending_orders_mv").count()
+    cancelled_count = spark.read.table("cancelled_orders_mv").count()
 
     # Sum of status-specific views should equal total orders
-    sum_of_statuses = approved_count + fulfilled_count + pending_count
+    sum_of_statuses = approved_count + fulfilled_count + pending_count + cancelled_count
 
     print(f"\n=== Status Distribution ===")
     print(f"Total orders: {orders_total}")
     print(f"Approved: {approved_count}")
     print(f"Fulfilled: {fulfilled_count}")
     print(f"Pending: {pending_count}")
+    print(f"Cancelled: {cancelled_count}")
     print(f"Sum: {sum_of_statuses}")
 
     assert sum_of_statuses == orders_total, \
@@ -142,6 +169,7 @@ def test_verify_column_consistency(spark):
     approved_df = spark.read.table("approved_orders_mv")
     fulfilled_df = spark.read.table("fulfilled_orders_mv")
     pending_df = spark.read.table("pending_orders_mv")
+    cancelled_df = spark.read.table("cancelled_orders_mv")
 
     # All views should have the same columns
     expected_columns = orders_df.columns
@@ -152,6 +180,8 @@ def test_verify_column_consistency(spark):
         "fulfilled_orders_mv should have same columns as orders_mv"
     assert pending_df.columns == expected_columns, \
         "pending_orders_mv should have same columns as orders_mv"
+    assert cancelled_df.columns == expected_columns, \
+        "cancelled_orders_mv should have same columns as orders_mv"
 
     print(f"\n=== Column Consistency Check ===")
     print(f"All views have consistent columns: {expected_columns}")

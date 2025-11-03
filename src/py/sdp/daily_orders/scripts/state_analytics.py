@@ -211,24 +211,25 @@ Examples:
         "--top",
         type=int,
         default=10,
-        help="Number of top states to display (default: 10)"
+        help="Number of top states to display by order volume (default: 10). Use --top 50 to see all states."
     )
     parser.add_argument(
         "--state",
         type=str,
         default=None,
-        help="Show detailed analytics for a specific state"
+        help="Show detailed analytics for a specific US state (e.g., 'California', 'New York'). Displays order counts, revenue, status breakdown, and top products for that state."
     )
     parser.add_argument(
         "--export",
         type=str,
         default=None,
-        help="Export state analytics to CSV file"
+        metavar="FILENAME",
+        help="Export state analytics to CSV file. Provide output filename (e.g., 'state_report.csv'). Exports order counts, revenue, and statistics for all states."
     )
     parser.add_argument(
         "--show-status",
         action="store_true",
-        help="Show order status distribution by state"
+        help="Show order status distribution (approved/fulfilled/pending/cancelled) by state. Can be combined with --top to limit results."
     )
 
     args = parser.parse_args()
