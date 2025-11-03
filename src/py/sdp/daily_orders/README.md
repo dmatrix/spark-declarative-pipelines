@@ -2,7 +2,9 @@
 
 ## Overview
 
-Daily Orders is a complete e-commerce order processing and analytics system built using Spark Declarative Pipelines (SDP). It demonstrates synthetic order data generation, materialized view transformations, and comprehensive sales analytics including tax calculations.
+Daily Orders is a complete e-commerce order processing and analytics system built using Spark Declarative Pipelines (SDP). It demonstrates **CSV-based streaming ingestion**, materialized view transformations, and comprehensive sales analytics including tax calculations.
+
+This pipeline showcases a realistic data engineering pattern where CSV files serve as the source of truth, demonstrating SDP's ability to ingest data from external sources rather than generating it in-memory.
 
 ## Project Structure
 
@@ -10,16 +12,23 @@ Daily Orders is a complete e-commerce order processing and analytics system buil
 daily_orders/
 ├── README.md                       # This file
 ├── pipeline.yml                    # SDP pipeline configuration
-├── run_pipeline.sh                 # Pipeline execution script
+├── run_pipeline.sh                 # Pipeline execution script with CSV generation
 ├── __init__.py                     # Python package initialization
+├── data/                           # CSV source data directory
+│   ├── .gitignore                  # Ignore CSV files (generated dynamically)
+│   ├── orders_001.csv              # Order data files (50 files × 1000 orders)
+│   ├── orders_002.csv
+│   └── ... (50 files total = 50,000 orders)
 ├── transformations/                # Data transformation definitions
-│   ├── orders_mv.py                # Main orders materialized view (Python)
+│   ├── orders_mv.py                # Main orders materialized view (reads CSVs)
 │   ├── approved_orders_mv.sql      # Approved orders filter (SQL)
 │   ├── fulfilled_orders_mv.sql     # Fulfilled orders filter (SQL)
 │   └── pending_orders_mv.sql       # Pending orders filter (SQL)
 ├── scripts/                        # Query and analysis scripts
-│   ├── query_tables.py             # Query and display order data
-│   └── calculate_sales_tax.py      # Sales tax calculations and analytics
+│   ├── generate_csv_data.py        # Generate CSV source files
+│   ├── query_tables.py             # Query and filter order data
+│   ├── calculate_sales_tax.py      # Sales tax calculations and analytics
+│   └── state_analytics.py          # Geographic analytics by US state
 ├── tests/                          # Test suite for materialized views
 │   └── test_materialized_views.py  # 9 comprehensive tests
 ├── spark-warehouse/                # Generated Spark warehouse data (auto-generated)
@@ -28,20 +37,32 @@ daily_orders/
 
 ## Features
 
-- **Synthetic Data Generation**: Creates realistic order data using Faker library
+- **CSV-Based Ingestion**: Reads order data from CSV files (50,000 orders across 50 files)
+- **Realistic Data Pattern**: CSV files serve as source of truth, showcasing external data ingestion
+- **Geographic Analytics**: Order distribution and revenue analysis across all 50 US states
+- **Reproducible Data Generation**: Random state support for deterministic data generation
 - **Materialized Views**: Declarative transformations using Python and SQL
-- **Order Status Filtering**: Separate views for approved, fulfilled, and pending orders
+- **Order Status Filtering**: Separate views for approved, fulfilled, pending, and cancelled orders
 - **Sales Tax Calculations**: Comprehensive tax computation and analytics
-- **Analytics Queries**: Ready-to-use query scripts for data analysis
+- **Analytics Queries**: Ready-to-use query scripts for data analysis with filtering options
+- **Data Generation Script**: Easily generate new CSV datasets with custom configurations
 
 ## Running the Pipeline
 
-### Option 1: Using the Shell Script
+### Option 1: Using the Shell Script (Recommended)
+
+The shell script automatically handles CSV generation if needed:
 
 ```bash
 cd /path/to/spark-declarative-pipelines/src/py/sdp/daily_orders
 ./run_pipeline.sh
 ```
+
+This script will:
+1. Check for CSV files in `data/` directory
+2. Generate 50 CSV files (50,000 orders) if they don't exist
+3. Clean Spark warehouse and metastore
+4. Run the SDP pipeline
 
 ### Option 2: Using Python Directly
 
@@ -54,25 +75,62 @@ uv run python main.py daily-orders
 
 ```bash
 cd /path/to/spark-declarative-pipelines/src/py/sdp/daily_orders
+# First, generate CSV data if needed
+uv run python scripts/generate_csv_data.py
+
+# Then run the pipeline
 spark-pipelines run --conf spark.sql.catalogImplementation=hive --conf spark.sql.warehouse.dir=spark-warehouse
 ```
+
+## Data Generation
+
+### Generating CSV Source Data
+
+The pipeline reads order data from CSV files. Generate them using:
+
+```bash
+cd /path/to/spark-declarative-pipelines/src/py/sdp/daily_orders
+
+# Generate 50 files with 1000 orders each (50,000 total orders)
+uv run python scripts/generate_csv_data.py
+
+# Custom configuration
+uv run python scripts/generate_csv_data.py --num-files 100 --orders-per-file 500
+
+# Regenerate data (clean existing files first)
+uv run python scripts/generate_csv_data.py --clean
+
+# Generate with reproducible random data
+uv run python scripts/generate_csv_data.py --random-state 42
+```
+
+**Key Points:**
+- CSV files are generated using `order_gen_util.py` for data consistency
+- Default: 50 files × 1000 orders = 50,000 total orders
+- Files are named sequentially: `orders_001.csv` through `orders_050.csv`
+- Supports `--random-state` flag for reproducible data generation
+- Order statuses include: **approved**, **fulfilled**, **pending**, **cancelled**
+- Data includes realistic product catalog with 20 different items
+- Each order is associated with a random US state (all 50 states)
 
 ## Data Transformations
 
 ### 1. Orders Materialized View (orders_mv.py)
 
-The base materialized view that generates random order items using the order generation utility:
+The base materialized view that reads order data from CSV files:
 
 - **Name**: `orders_mv`
 - **Type**: Python transformation with `@dp.materialized_view` decorator
-- **Data Source**: Dynamically generated using `order_gen_util.create_random_order_items()`
+- **Data Source**: CSV files in `data/` directory (batch read with wildcard pattern)
 - **Schema**:
   - `order_id`: Unique order identifier (UUID)
-  - `order_item`: Product name
-  - `price`: Item price
-  - `items_ordered`: Quantity ordered
-  - `status`: Order status (approved/pending/fulfilled)
-  - `date_ordered`: Order date
+  - `order_item`: Product name (20 possible items)
+  - `price`: Item price (float, $10-$1000 range)
+  - `items_ordered`: Quantity ordered (integer, 1-10 range)
+  - `status`: Order status (approved/fulfilled/pending/cancelled)
+  - `state`: US state where order was placed (all 50 states)
+  - `date_ordered`: Order date (within last 30 days)
+- **Implementation**: Uses explicit schema definition and reads all CSV files with `spark.read.csv("data/*.csv")`
 
 ### 2. Approved Orders View (approved_orders_mv.sql)
 
@@ -108,12 +166,21 @@ WHERE status = 'pending';
 
 ### 1. Query Tables (scripts/query_tables.py)
 
-Queries the orders materialized view and displays approved orders with selected fields.
+Queries the orders materialized views with filtering options and displays orders with all fields including state.
 
 **Run the script:**
 ```bash
 cd /path/to/spark-declarative-pipelines/src/py/sdp/daily_orders
+
+# Query all orders
 uv run python scripts/query_tables.py
+
+# Query by status
+uv run python scripts/query_tables.py --status approved
+uv run python scripts/query_tables.py --status fulfilled --limit 20
+
+# List all available tables
+uv run python scripts/query_tables.py --list
 ```
 
 **Sample Output:**
@@ -199,6 +266,79 @@ only showing top 10 rows
 |Tablet         |285.65                |42.85              |328.5               |
 |Puzzle         |247.68                |37.15              |284.83              |
 +---------------+----------------------+-------------------+--------------------+
+```
+
+### 3. State Analytics (scripts/state_analytics.py)
+
+Analyzes order distribution and revenue across all 50 US states. Provides geographic insights into sales performance, order status distribution by state, and state-specific detailed analytics.
+
+**Run the script:**
+```bash
+cd /path/to/spark-declarative-pipelines/src/py/sdp/daily_orders
+
+# Show top 10 states by order volume (default)
+uv run python scripts/state_analytics.py
+
+# Show top 20 states
+uv run python scripts/state_analytics.py --top 20
+
+# Analyze specific state
+uv run python scripts/state_analytics.py --state California
+uv run python scripts/state_analytics.py --state "New York"
+
+# Show order status distribution by state
+uv run python scripts/state_analytics.py --show-status
+
+# Export to CSV
+uv run python scripts/state_analytics.py --export state_report.csv
+```
+
+**Sample Output - State Distribution:**
+```
+==========================================================================================
+ORDER DISTRIBUTION BY STATE (Top 10)
+==========================================================================================
++------------+------------+-------------+---------------+-------------------+
+|state       |total_orders|total_revenue|avg_order_price|avg_items_per_order|
++------------+------------+-------------+---------------+-------------------+
+|Washington  |1089        |3111420.05   |504.63         |5.68               |
+|Kansas      |1057        |2984711.22   |499.94         |5.56               |
+|Pennsylvania|1047        |2958265.05   |498.93         |5.61               |
+|Oklahoma    |1043        |2996106.15   |513.04         |5.63               |
+|Hawaii      |1040        |2940039.89   |511.7          |5.47               |
++------------+------------+-------------+---------------+-------------------+
+
+Total Orders: 50,000
+States with Orders: 50
+Average Orders per State: 1000.0
+```
+
+**Sample Output - State Details (California):**
+```
+==========================================================================================
+DETAILED ANALYTICS FOR CALIFORNIA
+==========================================================================================
+
+📊 Overall Statistics:
+  - Total Orders: 981
+  - Total Revenue: $2,635,554.17
+  - Average Order Price: $494.18
+  - Average Items per Order: 5.42
+
+📋 Order Status Breakdown:
+  - Cancelled: 269 (27.4%)
+  - Fulfilled: 240 (24.5%)
+  - Approved: 238 (24.3%)
+  - Pending: 234 (23.9%)
+
+🛒 Top Products:
++---------------+-----------+---------+
+|order_item     |order_count|revenue  |
++---------------+-----------+---------+
+|Board Game     |63         |168732.42|
+|VR Headset     |58         |175516.37|
+|Action Figure  |57         |182425.51|
++---------------+-----------+---------+
 ```
 
 ## Testing
