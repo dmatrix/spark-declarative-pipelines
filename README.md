@@ -25,7 +25,7 @@ etl-pipelines/
 └── src/py/
     ├── sdp/                          # OSS Spark Declarative Pipelines examples
     │   ├── README.md                 # Comprehensive SDP documentation
-    │   ├── brickfood/                # E-commerce analytics pipeline
+    │   ├── daily_orders/             # E-commerce analytics pipeline
     │   ├── oil_rigs/                 # Industrial IoT monitoring pipeline
     │   └── utils/                    # Shared data generation utilities
     ├── lsdp/                         # Lakeflow Spark Declarative Pipelines (on Databricks)
@@ -48,8 +48,8 @@ cd src/py/sdp
 # Install dependencies with UV
 uv sync
 
-# Run BrickFood e-commerce pipeline
-python main.py brickfood
+# Run Daily Orders e-commerce pipeline
+python main.py daily-orders
 
 # Run Oil Rigs sensor monitoring pipeline
 python main.py oil-rigs
@@ -69,7 +69,7 @@ cd src/py/lsdp/music_analytics
 
 ## 📊 Use Cases Demonstrated
 
-### 1. **BrickFood E-commerce Analytics** (SDP)
+### 1. **Daily Orders E-commerce Analytics** (SDP)
 - **Framework**: Spark Declarative Pipelines
 - **Data**: Synthetic e-commerce orders with 20+ product categories
 - **Features**: Order lifecycle management, sales tax calculations, business analytics
@@ -118,7 +118,7 @@ cd src/py/lsdp/music_analytics
 cd src/py/sdp && uv sync
 
 # Run pipelines
-python main.py brickfood    # E-commerce analytics
+python main.py daily-orders # E-commerce analytics
 python main.py oil-rigs     # IoT sensor monitoring
 
 # Test utilities

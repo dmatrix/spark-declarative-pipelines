@@ -4,7 +4,7 @@ Spark Declarative Pipelines (SDP) Examples
 This package contains example implementations of Spark Declarative Pipelines (SDP),
 demonstrating data processing workflows for:
 
-- BrickFood: E-commerce order processing and analytics
+- Daily Orders: E-commerce order processing and analytics
 - Oil Rigs: Industrial IoT sensor monitoring and analysis
 
 The SDP framework enables declarative data transformations through Python decorators

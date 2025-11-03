@@ -3,6 +3,13 @@ from pyspark.sql.functions import col, round, sum
 
 # This script calculates total order prices and sales tax for approved orders
 # Run this script to compute 15% sales tax on total order amounts
+#
+# IMPORTANT: This script must be run from the daily_orders directory:
+#   cd /path/to/daily_orders
+#   uv run python scripts/calculate_sales_tax.py
+#
+# The relative path below (./spark-warehouse/) resolves from the current working directory,
+# which must be the daily_orders directory where spark-warehouse is located.
 
 # Location of the Spark database has all the materialized views
 spark_db_location = "file:///./spark-warehouse/"

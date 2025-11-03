@@ -2,7 +2,14 @@ from pyspark.sql import DataFrame, SparkSession
 
 # This script queries a materialized view in Spark and returns a DataFrame with order items.
 # Run this script to retrieve the data from the specified materialized view.
-# Create by a previous run of Spark Declarative Pipelines (SDP) command line: spark-pipelines
+# Created by a previous run of Spark Declarative Pipelines (SDP) command line: spark-pipelines
+#
+# IMPORTANT: This script must be run from the daily_orders directory:
+#   cd /path/to/daily_orders
+#   uv run python scripts/query_tables.py
+#
+# The relative path below (./spark-warehouse/) resolves from the current working directory,
+# which must be the daily_orders directory where spark-warehouse is located.
 
 # Location of the Spark database has all the materialized views
 spark_db_location = "file:///./spark-warehouse/"

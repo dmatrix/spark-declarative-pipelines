@@ -1,7 +1,7 @@
 [project]
 name = "spark-declarative-pipelines-examples"
 version = "0.1.0"
-description = "Example implementations of Spark Declarative Pipelines (SDP) and LakeFlow Declarative Pipelines (LDP) with PySpark 4.1.0.dev1, featuring BrickFood e-commerce, Oil Rigs sensor monitoring, and Music Analytics use cases"
+description = "Example implementations of Spark Declarative Pipelines (SDP) and LakeFlow Declarative Pipelines (LDP) with PySpark 4.1.0.dev1, featuring Daily Orders e-commerce, Oil Rigs sensor monitoring, and Music Analytics use cases"
 readme = "SDP_README.md"
 requires-python = ">=3.12"
 authors = [
@@ -40,7 +40,7 @@ dev = [
 ]
 
 [project.scripts]
-sdp-brickfood = "brickfood.query_tables:main"
+sdp-daily-orders = "daily_orders.query_tables:main"
 sdp-oil-rigs = "oil_rigs.query_oil_rigs_tables:main"
 
 [build-system]
@@ -48,10 +48,10 @@ requires = ["setuptools>=45", "wheel"]
 build-backend = "setuptools.build_meta"
 
 [tool.setuptools]
-packages = ["brickfood", "oil_rigs", "utils"]
+packages = ["daily_orders", "oil_rigs", "utils"]
 
 [tool.setuptools.package-data]
-brickfood = ["*.yml", "*.sql", "*.sh"]
+daily_orders = ["*.yml", "*.sql", "*.sh"]
 oil_rigs = ["*.yml", "*.sql", "*.sh"]
 
 [tool.uv]

@@ -1,4 +1,4 @@
-name: brickfood
+name: daily_orders
 storage: storage-root
 libraries:
   - glob:

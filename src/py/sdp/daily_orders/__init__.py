@@ -1,7 +1,7 @@
 """
-BrickFood E-commerce Pipeline
+Daily Orders E-commerce Pipeline
 
-This module contains the BrickFood e-commerce order processing pipeline,
+This module contains the Daily Orders e-commerce order processing pipeline,
 demonstrating order lifecycle management, financial calculations, and business analytics.
 
 Key components:
