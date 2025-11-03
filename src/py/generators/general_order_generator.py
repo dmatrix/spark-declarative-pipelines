@@ -24,15 +24,6 @@ setup_logging = generator_utils.setup_logging
 validate_generator_args = generator_utils.validate_generator_args
 OrderGenerator = generator_utils.OrderGenerator
 
-
-
-
-
-
-
-
-
-
 def parse_arguments() -> argparse.Namespace:
     """Parse command line arguments."""
     parser = argparse.ArgumentParser(

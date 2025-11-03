@@ -121,15 +121,17 @@ def test_verify_status_distribution(spark):
     approved_count = spark.read.table("approved_orders_mv").count()
     fulfilled_count = spark.read.table("fulfilled_orders_mv").count()
     pending_count = spark.read.table("pending_orders_mv").count()
+    cancelled_count = spark.read.table("cancelled_orders_mv").count()
 
-    # Sum of status-specific views should equal total orders
-    sum_of_statuses = approved_count + fulfilled_count + pending_count
+    # Sum of all statuses should equal total orders
+    sum_of_statuses = approved_count + fulfilled_count + pending_count + cancelled_count
 
     print(f"\n=== Status Distribution ===")
     print(f"Total orders: {orders_total}")
     print(f"Approved: {approved_count}")
     print(f"Fulfilled: {fulfilled_count}")
     print(f"Pending: {pending_count}")
+    print(f"Cancelled: {cancelled_count}")
     print(f"Sum: {sum_of_statuses}")
 
     assert sum_of_statuses == orders_total, \
