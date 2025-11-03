@@ -158,7 +158,6 @@ Requirements:
   - Spark Declarative Pipelines CLI must be installed
   - Use 'spark-pipelines --help' to verify CLI availability
 
-For more information, see SDP_README.md
         """
     )
 
