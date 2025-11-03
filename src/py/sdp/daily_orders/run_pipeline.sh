@@ -11,9 +11,16 @@ if [ ! -d "data" ] || [ -z "$(ls -A data/*.csv 2>/dev/null)" ]; then
     uv run python scripts/generate_csv_data.py --num-files 50 --orders-per-file 1000
     echo ""
 else
-    echo "  ✓ CSV files already exist in data/ directory"
-    echo "  To regenerate, run: uv run python scripts/generate_csv_data.py --clean"
-    echo ""
+    echo -n "  The Daily Orders csv files exist in the data/. Do you want to regenerate? [Y/N]:"
+    read -r response
+    if [[ "$response" =~ ^[Yy]$ ]]; then
+        echo "  Regenerating CSV files..."
+        uv run python scripts/generate_csv_data.py --num-files 50 --orders-per-file 1000 --clean
+        echo ""
+    else
+        echo "  ✓ Using existing CSV files in data/ directory"
+        echo ""
+    fi
 fi
 
 # Step 2: Clean existing Spark warehouse and metastore
