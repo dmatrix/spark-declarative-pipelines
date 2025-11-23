@@ -147,7 +147,7 @@ cat README.md
 
 This repository demonstrates:
 
-1. **Framework Comparison**: SDP vs SDP2DBX for different use cases and data processing paradigms
+1. **Framework Comparison**: SDP vs LSPD for different use cases and data processing paradigms
 2. **Data Generation**: Realistic synthetic data creation patterns with Faker library
 3. **Pipeline Architecture**: Declarative transformations, medallion architecture, and specialized table design
 4. **Quality Engineering**: Comprehensive data validation with `@dp.expect` rules and monitoring strategies
@@ -158,7 +158,7 @@ This repository demonstrates:
 ## 📚 Documentation
 
 - **[SDP README.md](src/py/sdp/README.md)**: Comprehensive Spark Declarative Pipelines guide
-- **[Music Analytics SDP README](src/py/sdp2dbx/music_analytics/README.md)**: Million Song Dataset Spark Declarative Pipelines implementation
+- **[Music Analytics SDP README](src/py/lspd/music_analytics/README.md)**: Million Song Dataset Spark Declarative Pipelines implementation
 - **[CLAUDE.md](CLAUDE.md)**: Claude Code configuration for repository navigation
 
 ## 🔧 Development Setup
