@@ -158,7 +158,7 @@ This repository demonstrates:
 ## 📚 Documentation
 
 - **[SDP README.md](src/py/sdp/README.md)**: Comprehensive Spark Declarative Pipelines guide
-- **[Music Analytics SDP README](src/py/lspd/music_analytics/README.md)**: Million Song Dataset Spark Declarative Pipelines implementation
+- **[Music Analytics SDP README](src/py/lsdp/music_analytics/README.md)**: Million Song Dataset Spark Declarative Pipelines implementation
 - **[CLAUDE.md](CLAUDE.md)**: Claude Code configuration for repository navigation
 
 ## 🔧 Development Setup
